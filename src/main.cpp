@@ -1,8 +1,8 @@
 #include <ArduinoBLE.h>
 
-const byte RedPin = 4;
-const byte GreenPin = 5;
-const byte BluePin = 30;
+const byte RedPin = A0;
+const byte GreenPin = A1;
+const byte BluePin = A2;
 
 BLEService ledService("180A"); // BLE LED Service
 
@@ -10,6 +10,7 @@ BLEService ledService("180A"); // BLE LED Service
 BLECharCharacteristic redValue("0001", BLERead | BLEWrite | BLENotify);
 BLECharCharacteristic greenValue("0002", BLERead | BLEWrite| BLENotify);
 BLECharCharacteristic blueValue("0003", BLERead | BLEWrite | BLENotify);
+BLECharCharacteristic brightValue("0004",BLERead | BLEWrite | BLENotify);
 
 void connectedLight() {
   digitalWrite(LEDR, LOW);
@@ -60,6 +61,13 @@ void blueupdate(BLEDevice central, BLECharacteristic characteristic){
   Serial.print(value);
   Serial.println();
 }
+void brightupdate(BLEDevice central, BLECharacteristic characteristic){
+  byte value = 0;
+  brightValue.readValue(value);
+  Serial.print("Brightness: ");
+  Serial.print(value);
+  Serial.println();
+}
 
 void setup() {
   Serial.begin(9600);
@@ -88,17 +96,19 @@ void setup() {
   
 
   // set advertised local name and service UUID:
-  BLE.setLocalName("Nano 33 BLE Sense");
+  BLE.setLocalName("Nano 33 BLE Sense 2");
   BLE.setAdvertisedService(ledService);
 
   redValue.setValue(255);
   blueValue.setValue(255);
   greenValue.setValue(255);
+  brightValue.setValue(255);
   
   // add the characteristic to the service
   ledService.addCharacteristic(redValue);
   ledService.addCharacteristic(greenValue);
   ledService.addCharacteristic(blueValue);
+  ledService.addCharacteristic(brightValue);
  
 
   // add service
@@ -112,6 +122,7 @@ void setup() {
   redValue.setEventHandler(BLEWritten, redupdate);
   blueValue.setEventHandler(BLEWritten, blueupdate);
   greenValue.setEventHandler(BLEWritten, greenupdate);
+  brightValue.setEventHandler(BLEWritten, brightupdate);
   // start advertising
   BLE.advertise();
 
