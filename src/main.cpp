@@ -6,22 +6,23 @@ const byte BluePin = A2;
 
 BLEService ledService("180A"); // BLE LED Service
 
-// BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by centra
+// BLE service charactersistics one for each color + bightness 
 BLECharCharacteristic redValue("0001", BLERead | BLEWrite | BLENotify);
 BLECharCharacteristic greenValue("0002", BLERead | BLEWrite| BLENotify);
 BLECharCharacteristic blueValue("0003", BLERead | BLEWrite | BLENotify);
 BLECharCharacteristic brightValue("0004",BLERead | BLEWrite | BLENotify);
 
+//turns off/on the led on the arduino nano depending on connection state
 void connectedLight() {
   digitalWrite(LEDR, LOW);
   digitalWrite(LEDG, HIGH);
 }
-
-
 void disconnectedLight() {
   digitalWrite(LEDR, HIGH);
   digitalWrite(LEDG, LOW);
 }
+
+
 
 void onBLEConnected(BLEDevice central) {
   Serial.print("Connected event, central: ");
@@ -36,7 +37,7 @@ void onBLEDisconnected(BLEDevice central) {
 }
 
 
-
+//inturput on recpetion of new R, g, B, or brightness values
 void redupdate(BLEDevice central, BLECharacteristic characteristic){
   byte value = 0;
   redValue.readValue(value);
@@ -99,6 +100,7 @@ void setup() {
   BLE.setLocalName("Nano 33 BLE Sense 2");
   BLE.setAdvertisedService(ledService);
 
+   //default color and brightness here set to black and full brightness 
   redValue.setValue(255);
   blueValue.setValue(255);
   greenValue.setValue(255);
@@ -119,6 +121,7 @@ void setup() {
   BLE.setEventHandler(BLEConnected, onBLEConnected);
   BLE.setEventHandler(BLEDisconnected, onBLEDisconnected);
 
+  //these are all the data inturupts  
   redValue.setEventHandler(BLEWritten, redupdate);
   blueValue.setEventHandler(BLEWritten, blueupdate);
   greenValue.setEventHandler(BLEWritten, greenupdate);
