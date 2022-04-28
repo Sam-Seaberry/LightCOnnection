@@ -4,7 +4,7 @@ const byte RedPin = A0;
 const byte GreenPin = A1;
 const byte BluePin = A2;
 
-BLEService ledService("180A"); // BLE LED Service
+BLEService ledService("1800"); // BLE LED Service
 
 // BLE service charactersistics one for each color + bightness 
 BLECharCharacteristic redValue("0001", BLERead | BLEWrite | BLENotify);
